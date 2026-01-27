@@ -1,0 +1,141 @@
+#include <unordered_map>
+#include <unordered_set>
+#include <string>
+#include <iostream>
+#include <sstream>
+#include <limits>
+#include "verifier.h"
+
+// pairings.size() != n:
+//     return invalid
+// iterate over pairs h s
+//  if h or s has already been matched before
+//      return invalid
+//  for s' > s in pref(h):
+//      if s' prefers h over their match (h > h')
+//          return unstable
+
+void verifier(){
+    int n;
+    std::cin >> n;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    std::vector<std::vector<int>> h_to_s_prefs;
+    std::vector<std::vector<int>> s_to_h_prefs;
+    // initialize preference 2d vectors (hospitals then students)
+    for (int i = 0; i < n; i++){
+        std::vector<int> vec = readVectorLine();
+        if (vec.size() != n){
+            std::cout<< "INVALID: Hospital preference list expected to be of size " << n 
+            << ". Received size " << vec.size() << " instead" << std::endl;
+            return;
+        }
+        h_to_s_prefs.push_back(vec);
+    }
+
+    for (int i = 0; i < n; i++){
+        std::vector<int> vec = readVectorLine();
+        if (vec.size() != n){
+            std::cout<< "INVALID: Student preference list expected to be of size " << n 
+            << ". Received size " << vec.size() << " instead" << std::endl;
+            return;
+        }
+        s_to_h_prefs.push_back(vec);
+    }
+    std::unordered_set<int> hosps;
+    std::unordered_set<int> studs;
+    std::unordered_map<int, int> stud_match;
+    std::unordered_map<int, int> hosp_match;
+    for (int i = 0; i < n; i++){
+        std::vector<int> pair = readVectorLine();
+        std::cout << "(" << pair[0] << ", " << pair[1] << ")" << std:: endl;
+        if (hosps.find(pair[0]) != hosps.end()){
+            std::cout<< "INVALID: Hospitals must only in one matching. Received multiple matching for hospital " << pair[0] << std::endl;
+            return;
+        }
+        hosps.emplace(pair[0]);
+        if (studs.find(pair[1]) != studs.end()){
+            std::cout<< "INVALID: Students must only in one matching. Received multiple matching for student " << pair[1] << std::endl;
+            return;
+        }
+        studs.emplace(pair[1]);
+        stud_match[pair[1]] = pair[0];
+        hosp_match[pair[0]] = pair[1];
+    }
+    std::unordered_map<int, std::unordered_map<int, int>>stud_ranks = createStudentRankings(s_to_h_prefs);
+    for (auto it = hosp_match.begin(); it != hosp_match.end(); ++it){
+        int h = it->first;
+        int s = it->second;
+        std::pair<int, int> blocking_pair = blockingPair(h_to_s_prefs[h - 1], stud_ranks, stud_match, h, s);
+        if (blocking_pair.first != -1){
+            std::cout<< "UNSTABLE: Found blocking pair composed by hospital " << blocking_pair.first << " and student " 
+            << blocking_pair.second << std::endl;
+            return;
+
+        }
+    }
+    std::cout << "STABLE VALID" << std::endl;
+    return;
+
+
+}
+
+
+std::pair<int, int> blockingPair(
+    const std::vector<int> &h_to_s_pref, 
+    std::unordered_map<int, std::unordered_map<int, int>>& stud_ranks, 
+    const std::unordered_map<int, int>& stud_match,
+    int h, 
+    int s
+){
+    for (size_t i = 0; i < h_to_s_pref.size() && h_to_s_pref[i] != s; i++){
+        int curr_student = h_to_s_pref[i];
+        int curr_stud_match = stud_match.at(curr_student);
+        // smaller rank means higher up on list -> more desired candidate, so blocking pair
+        if (stud_ranks[curr_student][h] < stud_ranks[curr_student][curr_stud_match]) 
+            return {h, curr_student};
+    }
+    // did not find a blocking pair
+    return {-1, -1};
+}
+
+/**
+ * @brief Creates a mapping for quickly retrieving ranking given to a hospital by a student from 0 to (n - 1).
+ *      i.e. map[student][hospital] = rank
+ */
+std::unordered_map<int, std::unordered_map<int, int>> createStudentRankings(
+    const std::vector<std::vector<int>>& s_to_h_prefs
+){
+    
+    std::unordered_map<int, std::unordered_map<int, int>> stud_ranks;
+    // iterate over pref list fo each student
+    for (size_t i = 0; i < s_to_h_prefs.size(); i++){
+        // ranking = index of each value in vector
+        for (size_t rank = 0; rank < s_to_h_prefs[i].size(); rank++){
+            // retrieve hospital at given rank
+            int h = s_to_h_prefs.at(i).at(rank);
+            // set value
+            stud_ranks[i][h] = rank;
+        }
+    }
+    return stud_ranks;
+}
+
+std::vector<int> readVectorLine(){
+    std::string line;
+    std::getline(std::cin, line);
+
+    std::istringstream ss(line);
+    std::vector<int> vec;
+    int x;
+
+    while (ss >> x){
+        vec.push_back(x);
+    }
+    return vec;
+}
+
+int main(){
+    verifier();
+    return 0;
+}
