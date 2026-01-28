@@ -5,16 +5,22 @@ CXXFLAGS = -std=c++17 -Wall -Wextra
 # Source files
 VERIFIER_SRC = src/verifier/verifier.cpp
 # GS_SRC       = src/gale_shapley/gale_shapley.cpp
+MATCHER_SRC  = src/matcher/matcher.cpp
 
 # Executable names
 VERIFIER_EXE = verifier
 # GS_EXE       = gale_shapley # change if needed
+MATCHER_EXE  = matcher
 
 # Default target: build both
-all: $(VERIFIER_EXE) #$(GS_EXE)
+all: $(VERIFIER_EXE) $(MATCHER_EXE)
 
 # Build verifier
 $(VERIFIER_EXE): $(VERIFIER_SRC)
+	$(CXX) $(CXXFLAGS) $^ -o $@
+
+# Build matcher
+$(MATCHER_EXE): $(MATCHER_SRC)
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
 # Build Gale–Shapley implementation
@@ -28,6 +34,11 @@ run_verifier: $(VERIFIER_EXE)
 	echo "Running verifier with $$INPUT_FILE"; \
 	./$(VERIFIER_EXE) < $$INPUT_FILE
 
+run_matcher: $(MATCHER_EXE)
+	@INPUT_FILE=$(if $(INPUT),$(INPUT),testcases/sample_input.txt); \
+	echo "Running matcher with $$INPUT_FILE"; \
+	./$(MATCHER_EXE) < $$INPUT_FILE
+
 # Run GS implementation with optional input file
 # Usage: make run_gs INPUT=testcases/my_input.txt
 run_gs: $(GS_EXE)
@@ -35,4 +46,4 @@ run_gs: $(GS_EXE)
 
 # Clean all executables
 clean:
-	rm -f $(VERIFIER_EXE) $(GS_EXE)
+	rm -f $(VERIFIER_EXE) $(MATCHER_EXE) $(GS_EXE)
