@@ -1,0 +1,7 @@
+# build artifacts
+verifier
+matcher
+*.dSYM
+
+# VS Code personal debug settings
+.vscode/launch.json
