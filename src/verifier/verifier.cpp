@@ -16,14 +16,14 @@
 //          return unstable
 
 void verifier(){
-    int n;
+    size_t n;
     std::cin >> n;
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     std::vector<std::vector<int>> h_to_s_prefs;
     std::vector<std::vector<int>> s_to_h_prefs;
     // initialize preference 2d vectors (hospitals then students)
-    for (int i = 0; i < n; i++){
+    for (size_t i = 0; i < n; i++){
         std::vector<int> vec = readVectorLine();
         if (vec.size() != n){
             std::cout<< "INVALID: Hospital preference list expected to be of size " << n 
@@ -31,31 +31,41 @@ void verifier(){
             return;
         }
         h_to_s_prefs.push_back(vec);
+        sanityCheck1DVec(vec, n);
     }
+    std::cout << "\nHospitals' preference list:" << std::endl;
+    printPrefList(h_to_s_prefs);
 
-    for (int i = 0; i < n; i++){
+    for (size_t i = 0; i < n; i++){
         std::vector<int> vec = readVectorLine();
         if (vec.size() != n){
             std::cout<< "INVALID: Student preference list expected to be of size " << n 
             << ". Received size " << vec.size() << " instead" << std::endl;
             return;
         }
+        sanityCheck1DVec(vec, n);
+
         s_to_h_prefs.push_back(vec);
     }
+    std::cout << "\nStudents' preference list:" << std::endl;
+    printPrefList(s_to_h_prefs);
+
     std::unordered_set<int> hosps;
     std::unordered_set<int> studs;
     std::unordered_map<int, int> stud_match;
     std::unordered_map<int, int> hosp_match;
-    for (int i = 0; i < n; i++){
+
+    std::cout << "\nDeclared matches" << std::endl;
+    for (size_t i = 0; i < n; i++){
         std::vector<int> pair = readVectorLine();
         std::cout << "(" << pair[0] << ", " << pair[1] << ")" << std:: endl;
         if (hosps.find(pair[0]) != hosps.end()){
-            std::cout<< "INVALID: Hospitals must only in one matching. Received multiple matching for hospital " << pair[0] << std::endl;
+            std::cout<< "INVALID: Hospitals must only be in one matching. Received multiple matching for hospital " << pair[0] << std::endl;
             return;
         }
         hosps.emplace(pair[0]);
         if (studs.find(pair[1]) != studs.end()){
-            std::cout<< "INVALID: Students must only in one matching. Received multiple matching for student " << pair[1] << std::endl;
+            std::cout<< "INVALID: Students must only be in one matching. Received multiple matching for student " << pair[1] << std::endl;
             return;
         }
         studs.emplace(pair[1]);
@@ -108,12 +118,12 @@ std::unordered_map<int, std::unordered_map<int, int>> createStudentRankings(
 ){
     
     std::unordered_map<int, std::unordered_map<int, int>> stud_ranks;
-    // iterate over pref list fo each student
-    for (size_t i = 0; i < s_to_h_prefs.size(); i++){
+    // iterate over pref list of each student
+    for (size_t i = 1; i < s_to_h_prefs.size() + 1; i++){
         // ranking = index of each value in vector
         for (size_t rank = 0; rank < s_to_h_prefs[i].size(); rank++){
             // retrieve hospital at given rank
-            int h = s_to_h_prefs.at(i).at(rank);
+            int h = s_to_h_prefs.at(i - 1).at(rank);
             // set value
             stud_ranks[i][h] = rank;
         }
@@ -130,9 +140,32 @@ std::vector<int> readVectorLine(){
     int x;
 
     while (ss >> x){
+        // std::cout << x << " ";
         vec.push_back(x);
     }
+    // std::cout<< std::endl;
     return vec;
+}
+
+void sanityCheck1DVec(const std::vector<int>& vec, int n){
+    for (int id : vec) {
+        if (id < 1 || id > n) {
+            std::cout << "INVALID: ID " << id << " out of range [1," << n << "]\n";
+            return;
+        }
+    }
+}
+
+void printPrefList(const std::vector<std::vector<int>> &pref_list)
+{
+    for (size_t row = 0; row < pref_list.size(); row++){
+        std::cout << row + 1 << ": ";
+        for (size_t entry = 0; entry < pref_list[row].size(); entry++){
+            std::cout << pref_list[row][entry] << " ";
+        }
+        std::cout << std::endl;
+
+    }
 }
 
 int main(){
