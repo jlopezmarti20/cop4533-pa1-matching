@@ -1,6 +1,6 @@
 # build artifacts
 verifier
-matcher
+/matcher
 *.dSYM
 
 # VS Code personal debug settings
