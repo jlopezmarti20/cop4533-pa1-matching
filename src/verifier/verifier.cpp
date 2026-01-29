@@ -16,14 +16,14 @@
 //          return unstable
 
 void verifier(){
-    int n;
+    size_t n;
     std::cin >> n;
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     std::vector<std::vector<int>> h_to_s_prefs;
     std::vector<std::vector<int>> s_to_h_prefs;
     // initialize preference 2d vectors (hospitals then students)
-    for (int i = 0; i < n; i++){
+    for (size_t i = 0; i < n; i++){
         std::vector<int> vec = readVectorLine();
         if (vec.size() != n){
             std::cout<< "INVALID: Hospital preference list expected to be of size " << n 
@@ -33,10 +33,10 @@ void verifier(){
         h_to_s_prefs.push_back(vec);
         sanityCheck1DVec(vec, n);
     }
-    std::cout << "Hospitals' pref list" << std::endl;
+    std::cout << "\nHospitals' preference list:" << std::endl;
     printPrefList(h_to_s_prefs);
 
-    for (int i = 0; i < n; i++){
+    for (size_t i = 0; i < n; i++){
         std::vector<int> vec = readVectorLine();
         if (vec.size() != n){
             std::cout<< "INVALID: Student preference list expected to be of size " << n 
@@ -47,7 +47,7 @@ void verifier(){
 
         s_to_h_prefs.push_back(vec);
     }
-    std::cout << "Students' pref list" << std::endl;
+    std::cout << "\nStudents' preference list:" << std::endl;
     printPrefList(s_to_h_prefs);
 
     std::unordered_set<int> hosps;
@@ -55,8 +55,8 @@ void verifier(){
     std::unordered_map<int, int> stud_match;
     std::unordered_map<int, int> hosp_match;
 
-    std::cout << "Declared matches" << std::endl;
-    for (int i = 0; i < n; i++){
+    std::cout << "\nDeclared matches" << std::endl;
+    for (size_t i = 0; i < n; i++){
         std::vector<int> pair = readVectorLine();
         std::cout << "(" << pair[0] << ", " << pair[1] << ")" << std:: endl;
         if (hosps.find(pair[0]) != hosps.end()){
