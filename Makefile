@@ -31,20 +31,20 @@ $(MATCHER_EXE): $(MATCHER_SRC) | $(BUILD_DIR)
 # Run verifier with optional input file
 # Usage: make run_verifier INPUT=testcases/my_input.txt
 run_verifier: $(VERIFIER_EXE)
-	@INPUT_FILE=$(if $(INPUT),$(INPUT),testcases/sample_input.txt); \
+	@INPUT_FILE=$(if $(INPUT),$(INPUT),testcases/verifier/sample_input.txt); \
 	echo "Running verifier with $$INPUT_FILE"; \
 	./$(VERIFIER_EXE) < $$INPUT_FILE
 
 # Run matcher with optional input file
 run_matcher: $(MATCHER_EXE)
-	@INPUT_FILE=$(if $(INPUT),$(INPUT),testcases/sample_input.txt); \
+	@INPUT_FILE=$(if $(INPUT),$(INPUT),testcases/matcher/sample_input.txt); \
 	echo "Running matcher with $$INPUT_FILE"; \
 	./$(MATCHER_EXE) < $$INPUT_FILE
 
 # Run GS implementation with optional input file
 # Usage: make run_gs INPUT=testcases/my_input.txt
 run_gs: $(GS_EXE)
-	@INPUT_FILE=$(if $(INPUT),$(INPUT),testcases/sample_input.txt); \
+	@INPUT_FILE=$(if $(INPUT),$(INPUT),testcases/matcher/sample_input.txt); \
 	./$(GS_EXE) < $$INPUT_FILE
 
 # Clean all executables
