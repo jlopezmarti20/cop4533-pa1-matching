@@ -17,3 +17,6 @@ std::unordered_map<int, std::unordered_map<int, int>> createStudentRankings(
 
 std::vector<int> readVectorLine();
 
+void sanityCheck1DVec(const std::vector<int>& vec, int n);
+void printPrefList(const std::vector<std::vector<int>>& pref_list);
+

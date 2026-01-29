@@ -1,7 +1,7 @@
 # build artifacts
-verifier
-matcher
+build/*
 *.dSYM
 
 # VS Code personal debug settings
 .vscode/launch.json
+.vscode/c_cpp_properties.json
