@@ -1,5 +1,11 @@
 # build artifacts
+ /matcher
+ /verifier
+
+# build directories
 build/*
+
+# macOS debug symbols
 *.dSYM
 
 # VS Code personal debug settings
