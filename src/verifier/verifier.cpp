@@ -6,73 +6,69 @@
 #include <limits>
 #include "verifier.h"
 
-// pairings.size() != n:
-//     return invalid
-// iterate over pairs h s
-//  if h or s has already been matched before
-//      return invalid
-//  for s' > s in pref(h):
-//      if s' prefers h over their match (h > h')
-//          return unstable
+
+
+
 
 void verifier(){
     size_t n;
     std::cin >> n;
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-    std::vector<std::vector<int>> h_to_s_prefs;
-    std::vector<std::vector<int>> s_to_h_prefs;
-    // initialize preference 2d vectors (hospitals then students)
-    for (size_t i = 0; i < n; i++){
-        std::vector<int> vec = readVectorLine();
-        if (vec.size() != n){
-            std::cout<< "INVALID: Hospital preference list expected to be of size " << n 
-            << ". Received size " << vec.size() << " instead" << std::endl;
-            return;
-        }
-        h_to_s_prefs.push_back(vec);
-        sanityCheck1DVec(vec, n);
-    }
+    std::vector<std::vector<int>> h_to_s_prefs = readPrefList(n);
+    std::vector<std::vector<int>> s_to_h_prefs = readPrefList(n);
+
     std::cout << "\nHospitals' preference list:" << std::endl;
     printPrefList(h_to_s_prefs);
 
-    for (size_t i = 0; i < n; i++){
-        std::vector<int> vec = readVectorLine();
-        if (vec.size() != n){
-            std::cout<< "INVALID: Student preference list expected to be of size " << n 
-            << ". Received size " << vec.size() << " instead" << std::endl;
-            return;
-        }
-        sanityCheck1DVec(vec, n);
-
-        s_to_h_prefs.push_back(vec);
-    }
     std::cout << "\nStudents' preference list:" << std::endl;
     printPrefList(s_to_h_prefs);
 
-    std::unordered_set<int> hosps;
-    std::unordered_set<int> studs;
-    std::unordered_map<int, int> stud_match;
-    std::unordered_map<int, int> hosp_match;
+    Matchings m = readMatches(n);
+    std::unordered_map<int, int> stud_match = m.student_to_hospital;
+    std::unordered_map<int, int> hosp_match = m.hospital_to_student;
 
-    std::cout << "\nDeclared matches" << std::endl;
-    for (size_t i = 0; i < n; i++){
-        std::vector<int> pair = readVectorLine();
-        std::cout << "(" << pair[0] << ", " << pair[1] << ")" << std:: endl;
-        if (hosps.find(pair[0]) != hosps.end()){
-            std::cout<< "INVALID: Hospitals must only be in one matching. Received multiple matching for hospital " << pair[0] << std::endl;
-            return;
-        }
-        hosps.emplace(pair[0]);
-        if (studs.find(pair[1]) != studs.end()){
-            std::cout<< "INVALID: Students must only be in one matching. Received multiple matching for student " << pair[1] << std::endl;
-            return;
-        }
-        studs.emplace(pair[1]);
-        stud_match[pair[1]] = pair[0];
-        hosp_match[pair[0]] = pair[1];
-    }
+    // std::cout << "\nDeclared matches" << std::endl;
+
     std::unordered_map<int, std::unordered_map<int, int>>stud_ranks = createStudentRankings(s_to_h_prefs);
+    // look for unstable matches
+    for (auto it = hosp_match.begin(); it != hosp_match.end(); ++it){
+        int h = it->first;
+        int s = it->second;
+        std::pair<int, int> blocking_pair = blockingPair(h_to_s_prefs[h - 1], stud_ranks, stud_match, h, s);
+        if (blocking_pair.first != -1){
+            std::cout<< "\nUNSTABLE: Found blocking pair composed by hospital " << blocking_pair.first << " and student " 
+            << blocking_pair.second << std::endl;
+            return;
+        }
+    }
+    std::cout << "\nSTABLE VALID" << std::endl;
+    return;
+
+
+}
+
+void verifier(std::vector<std::vector<int>> h_to_s_prefs, 
+    std::vector<std::vector<int>> s_to_h_prefs,
+    std::unordered_map<int, int> stud_match,
+    std::unordered_map<int, int> hosp_match,
+    size_t n
+    ){
+        if (h_to_s_prefs.size() != n){
+            throw std::invalid_argument("Hospital preference list does not match expected size");
+        }
+        if (s_to_h_prefs.size() != n){
+            throw std::invalid_argument("Student preference list does not match expected size");
+        }
+    // std::cout << "\nHospitals' preference list:" << std::endl;
+    // printPrefList(h_to_s_prefs);
+
+    // std::cout << "\nStudents' preference list:" << std::endl;
+    // printPrefList(s_to_h_prefs);
+
+    std::unordered_map<int, std::unordered_map<int, int>>stud_ranks = createStudentRankings(s_to_h_prefs);
+    std::cout<< "Student ranks created" << std::endl;
+    // look for unstable matches
     for (auto it = hosp_match.begin(); it != hosp_match.end(); ++it){
         int h = it->first;
         int s = it->second;
@@ -89,7 +85,6 @@ void verifier(){
 
 
 }
-
 
 std::pair<int, int> blockingPair(
     const std::vector<int> &h_to_s_pref, 
@@ -121,7 +116,7 @@ std::unordered_map<int, std::unordered_map<int, int>> createStudentRankings(
     // iterate over pref list of each student
     for (size_t i = 1; i < s_to_h_prefs.size() + 1; i++){
         // ranking = index of each value in vector
-        for (size_t rank = 0; rank < s_to_h_prefs[i].size(); rank++){
+        for (size_t rank = 0; rank < s_to_h_prefs[i - 1].size(); rank++){
             // retrieve hospital at given rank
             int h = s_to_h_prefs.at(i - 1).at(rank);
             // set value
@@ -168,7 +163,52 @@ void printPrefList(const std::vector<std::vector<int>> &pref_list)
     }
 }
 
-int main(){
-    verifier();
-    return 0;
+std::vector<std::vector<int>> readPrefList(size_t n){
+    std::vector<std::vector<int>> pref_list;
+    for (size_t i = 0; i < n; i++){
+        std::vector<int> vec = readVectorLine();
+        if (vec.size() != n) {
+            throw std::invalid_argument(
+                "INVALID: reference list expected to be of size " +
+                std::to_string(n) +
+                ". Received size " +
+                std::to_string(vec.size()) +
+                " instead"
+            );
+        }
+        pref_list.push_back(vec);
+        sanityCheck1DVec(vec, n);
+    }
+    return pref_list;
+}
+
+Matchings readMatches(size_t n) {
+    Matchings m;
+
+    for (size_t i = 0; i < n; i++) {
+        auto pair = readVectorLine();
+
+        if (m.hospitals.count(pair[0])) {
+            throw std::invalid_argument(
+                "INVALID: Hospitals must only be in one matching. "
+                "Received multiple matching for hospital " +
+                std::to_string(pair[0])
+            );
+        }
+
+        if (m.students.count(pair[1])) {
+            throw std::invalid_argument(
+                "INVALID: Students must only be in one matching. "
+                "Received multiple matching for student " +
+                std::to_string(pair[1])
+            );
+        }
+
+        m.hospitals.insert(pair[0]);
+        m.students.insert(pair[1]);
+        m.student_to_hospital[pair[1]] = pair[0];
+        m.hospital_to_student[pair[0]] = pair[1];
+    }
+
+    return m;
 }

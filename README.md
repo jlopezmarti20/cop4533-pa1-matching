@@ -1,6 +1,4 @@
 # cop4533-pa1-matching
-
-## Members & UFID:
-
-- Jesus Lopez - 13285108
-- Christian Betancourt Dias
+## Members: 
+- Jesus Lopez: 1328-5108
+- Christian Betancourt Dias: 3082-3881
