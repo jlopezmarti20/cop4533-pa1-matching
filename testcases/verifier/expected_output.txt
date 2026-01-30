@@ -1,0 +1,12 @@
+
+Hospitals' preference list:
+1: 1 3 2 
+2: 2 1 3 
+3: 3 2 1 
+
+Students' preference list:
+1: 1 3 2 
+2: 2 1 3 
+3: 3 2 1 
+
+UNSTABLE: Found blocking pair composed by hospital 1 and student 1
