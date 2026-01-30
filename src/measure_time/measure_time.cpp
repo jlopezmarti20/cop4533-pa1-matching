@@ -19,8 +19,8 @@ vector<vector<int>> generate_prefs(int n) {
 int main() {
     vector<int> ns = {1, 2, 4, 8, 16, 32, 64, 128, 256, 512};
 
-    ofstream matcher_csv("matcher_times.csv");
-    ofstream verifier_csv("verifier_times.csv");
+    ofstream matcher_csv("data/matcher_times.csv");
+    ofstream verifier_csv("data/verifier_times.csv");
 
     matcher_csv << "n,runtime_ms\n";
     verifier_csv << "n,runtime_ms\n";
@@ -35,7 +35,7 @@ int main() {
         auto end_match = chrono::high_resolution_clock::now();
 
         long long matcher_time =
-            chrono::duration_cast<chrono::milliseconds>(end_match - start_match).count();
+            chrono::duration_cast<chrono::microseconds>(end_match - start_match).count();
 
         matcher_csv << n << "," << matcher_time << "\n";
 
@@ -47,7 +47,7 @@ int main() {
             }
         }
         auto start_verify = chrono::high_resolution_clock::now();
-        cout << "entering verifier" << endl;
+        // cout << "entering verifier" << endl;
         verifier(
             h_prefs,
             s_prefs,
@@ -58,7 +58,7 @@ int main() {
         auto end_verify = chrono::high_resolution_clock::now();
 
         long long verifier_time =
-            chrono::duration_cast<chrono::milliseconds>(end_verify - start_verify).count();
+            chrono::duration_cast<chrono::microseconds>(end_verify - start_verify).count();
 
         verifier_csv << n << "," << verifier_time << "\n";
     }
