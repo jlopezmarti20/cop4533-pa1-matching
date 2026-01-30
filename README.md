@@ -7,6 +7,32 @@
 
 ---
 
+## Build Instructions
+
+This project uses a Makefile to compile all programs.
+
+To build everything (matcher, verifier, and timing program), run:
+
+make
+
+---
+
+## Running the Matcher
+
+To run the matcher using the provided sample input file:
+
+make run_matcher
+
+---
+
+## Running the Verifier
+
+To run the verifier using the provided sample input file:
+
+make run_verifier
+
+---
+
 ## Task C: Scalability Analysis
 
 We evaluated how the runtime of the hospital-proposing Gale Shapley matcher and the verifier scales as the number gospitals/students increases. We tested values of n = 1,2,4,8,16,32,64,128,256, and 512.
