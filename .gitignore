@@ -3,11 +3,14 @@
  /verifier
 
 # build directories
-build/*
+build/
 
 # macOS debug symbols
 *.dSYM
 
+# Python cache
+__pycache__/
+*.pyc
 # VS Code personal debug settings
 .vscode/launch.json
 .vscode/c_cpp_properties.json
