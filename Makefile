@@ -57,6 +57,9 @@ $(TIMER_EXE): $(TIMER_MAIN) $(MATCHER_CORE) $(VERIFIER_CORE) | $(BUILD_DIR)
 # =============================
 # Run targets
 # =============================
+plot:
+	python3 analysis/graph.py
+
 run_verifier: $(VERIFIER_EXE)
 	@INPUT_FILE=$(if $(INPUT),$(INPUT),testcases/verifier/sample_input.txt); \
 	echo "Running verifier with $$INPUT_FILE"; \
