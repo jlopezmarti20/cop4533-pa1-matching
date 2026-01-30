@@ -49,7 +49,6 @@ $(VERIFIER_EXE): $(VERIFIER_CORE) $(VERIFIER_MAIN) | $(BUILD_DIR)
 
 # =============================
 # Build timer executable
-# Links only the logic, no other mains
 # =============================
 $(TIMER_EXE): $(TIMER_MAIN) $(MATCHER_CORE) $(VERIFIER_CORE) | $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) $^ -o $@
